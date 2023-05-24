@@ -1,0 +1,130 @@
+service: aws-python-flask-dynamodb-api
+
+frameworkVersion: '3'
+
+custom:
+  tableName:
+    users: 'users-table-${sls:stage}'
+    archives: 'archives-table-${sls:stage}'
+    todos: 'todos-table-${sls:stage}'
+    tasks: 'tasks-table-${sls:stage}'
+    counters: 'counters-table-${sls:stage}'
+  wsgi:
+    app: app.app
+  dynamodb:
+    start:
+      host: 127.0.0.1
+      migrate: true
+      inMemory: true
+      port: 8000
+    stages:
+      - dev
+
+provider:
+  name: aws
+  runtime: python3.9
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, Arn ]
+  environment:
+    USERS_TABLE: ${self:custom.tableName.users}
+    ARCHIVES_TABLE: ${self:custom.tableName.archives}
+    TODOS_TABLE: ${self:custom.tableName.todos}
+    TASKS_TABLE: ${self:custom.tableName.tasks}
+    COUNTERS_TABLE: ${self:custom.tableName.counters}
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    events:
+      - httpApi: '*'
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+  - serverless-dynamodb-local
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName.users}
+    ArchivesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName.archives}
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: archiveId
+            AttributeType: N
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: archiveId
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName.todos}
+    TasksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: todoId
+            AttributeType: N
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: todoId
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName.tasks}
+    CountersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName.counters}
