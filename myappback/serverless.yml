@@ -15,8 +15,14 @@ custom:
     start:
       host: 127.0.0.1
       migrate: true
+      seed: true
       inMemory: true
       port: 8000
+    seed:
+      common:
+        sources:
+          - table: 'counters-table-${sls:stage}'
+            sources: [ ./migrations/counters.json ]
     stages:
       - dev
 
