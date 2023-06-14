@@ -1,0 +1,29 @@
+[
+    {
+      "archiveId": {"N": "1"},
+      "id": {"N": "1"},
+      "title": {"S": "test title 1"},
+      "tags": {"L": [{"S" :"a"}, {"S": "ab"}, {"S": "cd"}]}
+    },
+    {
+      "archiveId": {"N": "2"},
+      "id": {"N": "2"},
+      "title": {"S": "test title 2"},
+      "tags": {"L": [{"S" :"a"}, {"S": "ab"}, {"S": "cd"}]}
+    },
+    {
+      "archiveId": {"N": "2"},
+      "id": {"N": "3"},
+      "title": {"S": "test title 3"},
+      "tags": {"L": []}
+    },
+    {
+      "archiveId": {"N": "2"},
+      "id": {"N": "4"},
+      "title": {"S": "test title 4"},
+      "tags": {"L": [{"S" :"a"}, {"S": "ab"}, {"S": "cd"}]}
+    }
+]
+
+
+
