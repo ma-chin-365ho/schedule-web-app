@@ -1,12 +1,27 @@
 import os
 from abc import ABCMeta, abstractmethod
+from decimal import Decimal
 
 import boto3
+from boto3.dynamodb.types import TypeDeserializer
+
+dynamodb_type_deserializer = TypeDeserializer()
 
 def offline_dynamodb_client():
     return boto3.client(
         'dynamodb', region_name='localhost', endpoint_url='http://localhost:8000'
     )
+
+def remove_type_dynamodb_json(dynamodb_json_dict):
+    json_dict = {
+        k: dynamodb_type_deserializer.deserialize(v)
+        for k, v in dynamodb_json_dict.items()
+    }
+    for k, v in json_dict.items():
+         if isinstance(v, Decimal):
+             json_dict[k] = float(v)
+    return json_dict
+
 
 dynamodb_client = boto3.client('dynamodb')
 if os.environ.get('IS_OFFLINE'):
@@ -37,9 +52,7 @@ class DynamoDB(metaclass=ABCMeta):
         if not item:
             return None
         
-        dict_item = {}
-        for k, v in self.item_json().items():
-            dict_item[k] = item.get(k).get(list(v.keys())[0])
+        dict_item = remove_type_dynamodb_json(item)
         return dict_item
 
     def gets(self):
@@ -54,10 +67,7 @@ class DynamoDB(metaclass=ABCMeta):
 
         dict_items = []
         for item in items:
-            dict_item = {}
-            for k, v in item.items():
-                dict_item[k] = list(v.values())[0]
-            dict_items.append(dict_item)
+            dict_items.append(remove_type_dynamodb_json(item))
         
         return dict_items
 

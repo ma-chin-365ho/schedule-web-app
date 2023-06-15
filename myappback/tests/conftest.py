@@ -1,33 +1,23 @@
 import pytest
-import glob
-import os
-import json
-import boto3
+import time
 
-from db.dynamodb import offline_dynamodb_client
+from tests.utils import load_test_json, import_test_data_to_dynamodb, dynamodb_test_data
 
-def import_test_data():
-    test_tables = []
-    tdata_paths=glob.glob('./tests/data/*')
-    for td_p in tdata_paths:
-        table_name = os.path.splitext(os.path.basename(td_p))[0]
-        with open(td_p) as td_f:
-            table_data_dict = json.load(td_f)
-        test_tables.append((table_name, table_data_dict))
-    return test_tables
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def db_data():
-    test_tables = import_test_data()
+    global dynamodb_test_data
 
-    dynamodb_client = offline_dynamodb_client()
-    for table_name, table_recs in test_tables:
-        print(table_name)
-        for table_rec in table_recs:
-            dynamodb_client.put_item(
-                TableName=table_name,
-                Item=table_rec
-            )
+    load_test_json()
+
+    for _ in range(20):
+        try:
+            import_test_data_to_dynamodb(dynamodb_test_data)
+        except Exception as e:
+            print(type(e))
+            time.sleep(1)
+        else:
+            break
 
     yield
-    print("after test ...")
+    import_test_data_to_dynamodb(dynamodb_test_data)
+    #print("after test ...")
