@@ -9,6 +9,13 @@ class Archives(DynamoDB):
         self.id = None
         self.title = None
     
+    def json(self):
+        json = {
+            'id': self.id,
+            'title': self.title
+        }
+        return json
+
     def key_json(self, key_val):
         json = {
             'id': {'N': None}
@@ -19,11 +26,5 @@ class Archives(DynamoDB):
                 json[k] = {list(json[k].keys())[0] : str(v)}
         return json
 
-    def item_json(self):
-        json = {
-            'id': {'N': self.id},
-            'title': {'S': self.title}
-        }
-        return json
 
     

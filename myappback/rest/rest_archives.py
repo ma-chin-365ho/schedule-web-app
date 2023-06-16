@@ -16,7 +16,7 @@ class RestArchives():
         archives = Archives()
         archive_json = archives.get(id = archive_id)
         if not archive_json:
-            return jsonify({'error': 'Could not find archive with provided "archive_id"'}), 404
+            return jsonify({'error': 'Could not find archive with provided "archiveId"'}), 404
         return jsonify(archive_json)
 
     @staticmethod

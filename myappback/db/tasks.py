@@ -16,28 +16,29 @@ class Tasks(DynamoDB):
         self.contents = None
         self.tags = None
 
+    def json(self):
+        json = {
+            'todoId' : self.todo_id,
+            'id': self.id,
+            'title': self.title,
+            'schedualStDate': self.schedual_st_date,
+            'schedualStTime': self.schedual_st_time,
+            'schedualEdDate': self.schedual_ed_date,
+            'schedualEdTime': self.schedual_ed_time,
+            'contents': self.contents,
+            'tags': self.tags
+        }
+        return json
+
     def key_json(self, key_val):
         json = {
+            'todoId': {'N': None},
             'id': {'N': None}
         }
         if any(key_val):
             for k, v in key_val.items():
                 # 'N'項目でもstr型にしないとboto3で型エラーになる。
                 json[k] = {list(json[k].keys())[0] : str(v)}
-        return json
-
-    def item_json(self):
-        json = {
-            'todo_id' : {'N': self.todo_id},
-            'id': {'N': self.id},
-            'title': {'S': self.title},
-            'schedual_st_date': {'N': self.title},
-            'schedual_st_time': {'N': self.title},
-            'schedual_ed_date': {'N': self.title},
-            'schedual_ed_time': {'N': self.title},
-            'contents': {'S': self.title},
-            'tags': {'L' : self.tags}   # tags = [{'S': "xxx"}, {'S': "yyy"}, ... ]
-        }
         return json
 
     

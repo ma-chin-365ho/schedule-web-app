@@ -1,4 +1,6 @@
 import os
+from boto3.dynamodb.conditions import Key
+
 from db.dynamodb import DynamoDB
 
 TODOS_TABLE = os.environ['TODOS_TABLE']
@@ -11,8 +13,18 @@ class Todos(DynamoDB):
         self.title = None
         self.tags = None
     
+    def json(self):
+        json = {
+            'archiveId' : self.archive_id,
+            'id': self.id,
+            'title': self.title,
+            'tags': self.tags
+        }
+        return json
+
     def key_json(self, key_val):
         json = {
+            'archiveId': {'N': None},
             'id': {'N': None}
         }
         if any(key_val):
@@ -20,14 +32,3 @@ class Todos(DynamoDB):
                 # 'N'項目でもstr型にしないとboto3で型エラーになる。
                 json[k] = {list(json[k].keys())[0] : str(v)}
         return json
-
-    def item_json(self):
-        json = {
-            'archive_id' : {'N': self.archive_id},
-            'id': {'N': self.id},
-            'title': {'S': self.title},
-            'tags': {'L' : self.tags}   # tags = [{'S': "xxx"}, {'S': "yyy"}, ... ]
-        }
-        return json
-
-    

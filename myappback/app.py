@@ -38,7 +38,7 @@ def get_all_todo():
 
 @app.route('/todos/<int:archive_id>')
 def get_todo(archive_id):
-    return RestTodos.get(archive_id)
+    return RestTodos.get_by_archive_id(archive_id)
 
 @app.route('/todos', methods=['POST'])
 def post_todo():
@@ -48,9 +48,9 @@ def post_todo():
 def put_todo():
     return RestTodos.put()
 
-@app.route('/todos/<int:todo_id>', methods=['DELETE'])
-def delete_todo(todo_id):
-    return RestTodos.delete(todo_id)
+@app.route('/todos/<int:archive_id>/<int:todo_id>', methods=['DELETE'])
+def delete_todo(archive_id, todo_id):
+    return RestTodos.delete(archive_id, todo_id)
 
 
 @app.route('/tasks')
@@ -58,8 +58,8 @@ def get_all_task():
     return RestTasks.get_all()
 
 @app.route('/tasks/<int:todo_id>')
-def get_task(archive_id):
-    return RestTasks.get(archive_id)
+def get_task(todo_id):
+    return RestTasks.get_by_todo_id(todo_id)
 
 @app.route('/tasks', methods=['POST'])
 def post_task():
@@ -69,9 +69,9 @@ def post_task():
 def put_task():
     return RestTasks.put()
 
-@app.route('/tasks/<int:task_id>', methods=['DELETE'])
-def delete_task(task_id):
-    return RestTasks.delete(task_id)
+@app.route('/tasks/<int:todo_id>/<int:task_id>', methods=['DELETE'])
+def delete_task(todo_id, task_id):
+    return RestTasks.delete(todo_id, task_id)
 
 
 @app.errorhandler(404)

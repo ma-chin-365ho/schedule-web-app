@@ -22,50 +22,57 @@ def test_todos_get(db_data):
         get_test_json_by_tablename(TODOS_TABLE)
     ))
 
-    assert v == e_v
+    assert sorted(v, key=lambda x: x['id']) == e_v
     assert r.status_code == 200
 
 def test_todos_post(db_data):
     post_data = {
-        "archiveId" : "3",
-        "id" : "45",
-        "title" : "テスト　22",
+        "archiveId" : 2222,
+        "id" : 45,
+        "title" : "テスト　ポスト 22",
         "tags" : ["test", "test2"]
     }
     r = requests.post(API_URL + '/todos', json = post_data)
     assert r.status_code == 200
 
-    target_id = post_data["id"]
+    target_id = str(post_data["archiveId"])
     r = requests.get(API_URL + '/todos/' + target_id)
     v = r.json()
-    e_v = dict(post_data, **{"id" : float(post_data["id"])})
+    e_v = [post_data]
     assert v == e_v
     assert r.status_code == 200
 
 def test_todos_put(db_data):
     put_data = {
-        "archiveId" : "2",
-        "id" : "4",
+        "archiveId" : 2,
+        "id" : 3,
         "title" : "テスト 変更後　22",
         "tags" : ["test", "test2"]
     }
     r = requests.put(API_URL + '/todos', json = put_data)
     assert r.status_code == 200
 
-    target_id = put_data["id"]
+    target_id = str(put_data["archiveId"])
     r = requests.get(API_URL + '/todos/' + target_id)
-    v = r.json()
-    e_v = dict(put_data, **{"id" : float(put_data["id"])})
+    v = list(filter(
+        lambda item : item['id'] == float(put_data["id"]),
+        r.json()
+    ))    
+    e_v = [put_data]
     assert v == e_v
     assert r.status_code == 200
 
 def test_todos_delete(db_data):
-    target_id = "2"
-    r = requests.delete(API_URL + '/todos/' + target_id)
+    target_archive_id = "2"
+    target_id = "4"
+    r = requests.delete(API_URL + '/todos/' + target_archive_id + '/' + target_id)
     assert r.status_code == 200
 
-    r = requests.get(API_URL + '/todos/' + target_id)
-    v = r.json()
-    e_v = {"error": 'Could not find archive with provided "archive_id"'}
+    r = requests.get(API_URL + '/todos/' + target_archive_id)
+    v = list(filter(
+        lambda item : item['id'] == float(target_id),
+        r.json()
+    ))
+    e_v = []
     assert v == e_v
-    assert r.status_code == 404
+    assert r.status_code == 200

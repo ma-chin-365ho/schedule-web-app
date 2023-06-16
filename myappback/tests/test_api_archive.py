@@ -27,13 +27,13 @@ def test_archives_get(db_data):
 
 def test_archives_post(db_data):
     post_data = {
-        "id" : "125",
+        "id" : 125,
         "title" : "テスト　22"
     }
     r = requests.post(API_URL + '/archives', json = post_data)
     assert r.status_code == 200
 
-    target_id = post_data["id"]
+    target_id = str(post_data["id"])
     r = requests.get(API_URL + '/archives/' + target_id)
     v = r.json()
     e_v = dict(post_data, **{"id" : float(post_data["id"])})
@@ -42,13 +42,13 @@ def test_archives_post(db_data):
 
 def test_archives_put(db_data):
     put_data = {
-        "id" : "3",
+        "id" : 3,
         "title" : "変更後タイトル"
     }
     r = requests.put(API_URL + '/archives', json = put_data)
     assert r.status_code == 200
 
-    target_id = put_data["id"]
+    target_id = str(put_data["id"])
     r = requests.get(API_URL + '/archives/' + target_id)
     v = r.json()
     e_v = dict(put_data, **{"id" : float(put_data["id"])})
@@ -62,6 +62,6 @@ def test_archives_delete(db_data):
 
     r = requests.get(API_URL + '/archives/' + target_id)
     v = r.json()
-    e_v = {"error": 'Could not find archive with provided "archive_id"'}
+    e_v = {"error": 'Could not find archive with provided "archiveId"'}
     assert v == e_v
     assert r.status_code == 404

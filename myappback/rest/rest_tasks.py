@@ -12,35 +12,35 @@ class RestTasks():
         return jsonify(task_json)
 
     @staticmethod
-    def get(todo_id):
+    def get_by_todo_id(todo_id):
         tasks = Tasks()
-        task_json = tasks.gets(id = todo_id)
+        task_json = tasks.query("todoId", "=", todo_id)
         if not task_json:
-            return jsonify({'error': 'Could not find task with provided "todo_id"'}), 404
+            return jsonify({'error': 'Could not find task with provided "todoId"'}), 404
         return jsonify(task_json)
 
     @staticmethod
     def post():
-        todo_id = request.json.get('todo_id')
-        task_id = request.json.get('task_id')
+        todo_id = request.json.get('todoId')
+        task_id = request.json.get('id')
         title = request.json.get('title')
-        schedual_st_date = request.json.get('schedual_st_date')
-        schedual_st_time = request.json.get('schedual_st_time')
-        schedual_ed_date = request.json.get('schedual_ed_date')
-        schedual_ed_time = request.json.get('schedual_ed_time')
+        schedual_st_date = request.json.get('schedualStDate')
+        schedual_st_time = request.json.get('schedualStTime')
+        schedual_ed_date = request.json.get('schedualEdDate')
+        schedual_ed_time = request.json.get('schedualEdTime')
         contents = request.json.get('contents')
         tags = request.json.get('tags')
-        if (not todo_id or
-            not task_id or
-            not title or 
-            not schedual_st_date or
-            not schedual_st_time or
-            not schedual_ed_date or
-            not schedual_ed_time or
-            not contents or
-            not tags
-        ):
-            return jsonify({'error': 'Please provide both "todo_id" and "id" and "title" and ...'}), 400
+#        if (not todo_id or
+#            not task_id or
+#            not title or 
+#            not schedual_st_date or
+#            not schedual_st_time or
+#            not schedual_ed_date or
+#            not schedual_ed_time or
+#            not contents or
+#            not tags
+#        ):
+#            return jsonify({'error': 'Please provide both "todoId" and "id" and "title" and ...'}), 400
 
         tasks = Tasks()
         tasks.todo_id = todo_id
@@ -55,12 +55,13 @@ class RestTasks():
         tasks.add()
         return jsonify(
             {
-                'todo_id': todo_id,
+                'todoId': todo_id,
                 'id': task_id,
-                'schedual_st_date': schedual_st_date,
-                'schedual_st_time': schedual_st_time,
-                'schedual_ed_date': schedual_ed_date,
-                'schedual_ed_time': schedual_ed_time,
+                'title' : title,
+                'schedualStDate': schedual_st_date,
+                'schedualStTime': schedual_st_time,
+                'schedualEdDate': schedual_ed_date,
+                'schedualEdTime': schedual_ed_time,
                 'contents': contents,
                 'tags': tags
             }
@@ -69,26 +70,26 @@ class RestTasks():
 
     @staticmethod
     def put():
-        todo_id = request.json.get('todo_id')
-        task_id = request.json.get('task_id')
+        todo_id = request.json.get('todoId')
+        task_id = request.json.get('id')
         title = request.json.get('title')
-        schedual_st_date = request.json.get('schedual_st_date')
-        schedual_st_time = request.json.get('schedual_st_time')
-        schedual_ed_date = request.json.get('schedual_ed_date')
-        schedual_ed_time = request.json.get('schedual_ed_time')
+        schedual_st_date = request.json.get('schedualStDate')
+        schedual_st_time = request.json.get('schedualStTime')
+        schedual_ed_date = request.json.get('schedualEdDate')
+        schedual_ed_time = request.json.get('schedualEdTime')
         contents = request.json.get('contents')
         tags = request.json.get('tags')
-        if (not todo_id or
-            not task_id or
-            not title or 
-            not schedual_st_date or
-            not schedual_st_time or
-            not schedual_ed_date or
-            not schedual_ed_time or
-            not contents or
-            not tags
-        ):
-            return jsonify({'error': 'Please provide both "todo_id" and "id" and "title" and ...'}), 400
+#        if (not todo_id or
+#            not task_id or
+#            not title or 
+#            not schedual_st_date or
+#            not schedual_st_time or
+#            not schedual_ed_date or
+#            not schedual_ed_time or
+#            not contents or
+#            not tags
+#        ):
+#            return jsonify({'error': 'Please provide both "todoId" and "id" and "title" and ...'}), 400
 
         tasks = Tasks()
         tasks.todo_id = todo_id
@@ -103,19 +104,20 @@ class RestTasks():
         tasks.update()
         return jsonify(
             {
-                'todo_id': todo_id,
+                'todoId': todo_id,
                 'id': task_id,
-                'schedual_st_date': schedual_st_date,
-                'schedual_st_time': schedual_st_time,
-                'schedual_ed_date': schedual_ed_date,
-                'schedual_ed_time': schedual_ed_time,
+                'title' : title,
+                'schedualStDate': schedual_st_date,
+                'schedualStTime': schedual_st_time,
+                'schedualEdDate': schedual_ed_date,
+                'schedualEdTime': schedual_ed_time,
                 'contents': contents,
                 'tags': tags
             }
         )
 
     @staticmethod
-    def delete(task_id):
+    def delete(todo_id, task_id):
         tasks = Tasks()
-        tasks.delete(id = task_id)
-        return jsonify({'id': task_id})
+        tasks.delete(todoId = todo_id, id = task_id)
+        return jsonify({'todoId' : todo_id, 'id': task_id})
