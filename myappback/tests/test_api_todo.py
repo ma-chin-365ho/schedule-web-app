@@ -3,7 +3,8 @@ import requests
 
 from constants import API_URL
 from tests.utils import get_test_json_by_tablename
-from db.todos import TODOS_TABLE
+from db.todos import TODOS_TABLE, TODOS_COUNTER_NAME
+from db.dynamodb import COUNTERS_TABLE
 
 def test_todos_get_all(db_data):
     r = requests.get(API_URL + '/todos')
@@ -39,6 +40,27 @@ def test_todos_post(db_data):
     r = requests.get(API_URL + '/todos/' + target_id)
     v = r.json()
     e_v = [post_data]
+    assert v == e_v
+    assert r.status_code == 200
+
+def test_todos_post_auto_increment(db_data):
+    post_data = {
+        "archiveId" : 4321,
+        "title" : "テスト　ポスト 22",
+        "tags" : ["test", "test2"]
+    }
+    id_by_counter = list(filter(
+        lambda item : item['name'] == TODOS_COUNTER_NAME,
+        get_test_json_by_tablename(COUNTERS_TABLE)
+    ))[0]['val']
+
+    r = requests.post(API_URL + '/todos', json = post_data)
+    assert r.status_code == 200
+
+    target_id = str(post_data["archiveId"])
+    r = requests.get(API_URL + '/todos/' + target_id)
+    v = r.json()
+    e_v = [dict(post_data, **{"id" : id_by_counter+1})]
     assert v == e_v
     assert r.status_code == 200
 

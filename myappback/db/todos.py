@@ -4,10 +4,11 @@ from boto3.dynamodb.conditions import Key
 from db.dynamodb import DynamoDB
 
 TODOS_TABLE = os.environ['TODOS_TABLE']
+TODOS_COUNTER_NAME = os.environ['TODOS_COUNTER_NAME']
 
 class Todos(DynamoDB):
     def __init__(self):
-        super().__init__(TODOS_TABLE)
+        super().__init__(TODOS_TABLE, TODOS_COUNTER_NAME)
         self.archive_id = None
         self.id = None
         self.title = None

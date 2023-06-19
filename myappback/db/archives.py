@@ -2,10 +2,11 @@ import os
 from db.dynamodb import DynamoDB
 
 ARCHIVES_TABLE = os.environ['ARCHIVES_TABLE']
+ARCHIVES_COUNTER_NAME = os.environ['ARCHIVES_COUNTER_NAME']
 
 class Archives(DynamoDB):
     def __init__(self):
-        super().__init__(ARCHIVES_TABLE)
+        super().__init__(ARCHIVES_TABLE, ARCHIVES_COUNTER_NAME)
         self.id = None
         self.title = None
     

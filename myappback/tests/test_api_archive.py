@@ -3,7 +3,8 @@ import requests
 
 from constants import API_URL
 from tests.utils import get_test_json_by_tablename
-from db.archives import ARCHIVES_TABLE
+from db.archives import ARCHIVES_TABLE, ARCHIVES_COUNTER_NAME
+from db.dynamodb import COUNTERS_TABLE
 
 def test_archives_get_all(db_data):
     r = requests.get(API_URL + '/archives')
@@ -39,6 +40,26 @@ def test_archives_post(db_data):
     e_v = dict(post_data, **{"id" : float(post_data["id"])})
     assert v == e_v
     assert r.status_code == 200
+
+def test_archives_post_auto_increment(db_data):
+    post_data = {
+        "title" : "オートインクリメント　テスト　22"
+    }
+    id_by_counter = list(filter(
+        lambda item : item['name'] == ARCHIVES_COUNTER_NAME,
+        get_test_json_by_tablename(COUNTERS_TABLE)
+    ))[0]['val']
+
+    r = requests.post(API_URL + '/archives', json = post_data)
+    assert r.status_code == 200
+
+    target_id = str(int(id_by_counter+1))
+    r = requests.get(API_URL + '/archives/' + target_id)
+    v = r.json()
+    e_v = dict(post_data, **{"id" : float(target_id)})
+    assert v == e_v
+    assert r.status_code == 200
+
 
 def test_archives_put(db_data):
     put_data = {

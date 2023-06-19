@@ -2,10 +2,12 @@ import os
 from db.dynamodb import DynamoDB
 
 TASKS_TABLE = os.environ['TASKS_TABLE']
+TASKS_COUNTER_NAME = os.environ['TASKS_COUNTER_NAME']
+
 
 class Tasks(DynamoDB):
     def __init__(self):
-        super().__init__(TASKS_TABLE)
+        super().__init__(TASKS_TABLE, TASKS_COUNTER_NAME)
         self.todo_id = None
         self.id = None
         self.title = None

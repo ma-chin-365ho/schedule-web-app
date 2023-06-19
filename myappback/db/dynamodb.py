@@ -6,6 +6,8 @@ import boto3
 from boto3.dynamodb.types import TypeDeserializer
 from boto3.dynamodb.types import TypeSerializer
 
+COUNTERS_TABLE = os.environ['COUNTERS_TABLE']
+
 dynamodb_type_deserializer = TypeDeserializer()
 dynamodb_type_serializer = TypeSerializer()
 dynamodb_client = boto3.client('dynamodb')
@@ -35,8 +37,9 @@ def add_type_dynamodb_json(json_dict):
     return dynamodb_json_dict
 
 class DynamoDB(metaclass=ABCMeta):
-    def __init__(self, table_name):
+    def __init__(self, table_name, counter_name = ""):
         self.table_name = table_name
+        self.counter_name = counter_name
     
     @abstractmethod
     def json(self):
@@ -100,16 +103,22 @@ class DynamoDB(metaclass=ABCMeta):
 
 
     def add(self):
+        add_json = self.json()
+        auto_inc_attr_name = "id"        
+        if add_json.get(auto_inc_attr_name) is None:
+            self.auto_increment(add_json, auto_inc_attr_name, self.counter_name)
+            self.id = add_json[auto_inc_attr_name]
         dynamodb_client.put_item(
             TableName=self.table_name,
-            Item=add_type_dynamodb_json(self.json())
+            Item=add_type_dynamodb_json(add_json)
         )
         # [TBD]error handling
         return
     
     def update(self):
-        key_val = self.make_update_key_val()
-        (update_expression, expression_attribute_values) = self.make_update_expression()
+        dynamodb_json = add_type_dynamodb_json(self.json())
+        key_val = self.make_update_key_val(self.key_json(key_val = {}), dynamodb_json)
+        (update_expression, expression_attribute_values) = self.make_update_expression(self.key_json(key_val = {}), dynamodb_json)
 
         dynamodb_client.update_item(
             TableName=self.table_name,
@@ -121,19 +130,19 @@ class DynamoDB(metaclass=ABCMeta):
         # [TBD]error handling
         return
 
-    def make_update_key_val(self):
+    def make_update_key_val(self, key_json, item_json):
         key_val = {}
-        items = add_type_dynamodb_json(self.json())
-        for k in self.key_json(key_val = {}):
+        items = item_json
+        for k in key_json:
             key_val[k] = items[k]
         return key_val
 
-    def make_update_expression(self):
-        keys = list(self.key_json(key_val = {}).keys())
+    def make_update_expression(self, key_json, item_json):
+        keys = list(key_json.keys())
         update_expression = "SET "
         expression_attribute_values = {}
         is_first = True
-        for k, v in add_type_dynamodb_json(self.json()).items():
+        for k, v in item_json.items():
             if not k in keys:
                 if is_first:
                     comma = ""
@@ -152,3 +161,33 @@ class DynamoDB(metaclass=ABCMeta):
         )
         # [TBD]error handling
         return
+
+    def auto_increment(self, target_json, attr_name, counter_name):
+        if counter_name == "":
+            return
+        counter_key_json = {
+            'name': {'S': counter_name}
+        }
+        result = dynamodb_client.get_item(
+            TableName=COUNTERS_TABLE,
+            Key=counter_key_json
+        )
+        counter_item_json = result.get('Item')
+        if not counter_item_json:
+            return
+        counter_item_json["val"]["N"] = str(int(counter_item_json["val"]["N"]) + 1)
+
+        (update_expression, expression_attribute_values) = self.make_update_expression(counter_key_json, counter_item_json)
+        dynamodb_client.update_item(
+            TableName=COUNTERS_TABLE,
+            Key=counter_key_json,
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ReturnValues="UPDATED_NEW"
+        )
+
+        target_json[attr_name] = int(counter_item_json["val"]["N"])
+        return
+
+
+

@@ -53,19 +53,7 @@ class RestTasks():
         tasks.contents = contents
         tasks.tags = tags
         tasks.add()
-        return jsonify(
-            {
-                'todoId': todo_id,
-                'id': task_id,
-                'title' : title,
-                'schedualStDate': schedual_st_date,
-                'schedualStTime': schedual_st_time,
-                'schedualEdDate': schedual_ed_date,
-                'schedualEdTime': schedual_ed_time,
-                'contents': contents,
-                'tags': tags
-            }
-        )
+        return jsonify(tasks.json())
 
 
     @staticmethod
@@ -102,19 +90,7 @@ class RestTasks():
         tasks.contents = contents
         tasks.tags = tags
         tasks.update()
-        return jsonify(
-            {
-                'todoId': todo_id,
-                'id': task_id,
-                'title' : title,
-                'schedualStDate': schedual_st_date,
-                'schedualStTime': schedual_st_time,
-                'schedualEdDate': schedual_ed_date,
-                'schedualEdTime': schedual_ed_time,
-                'contents': contents,
-                'tags': tags
-            }
-        )
+        return jsonify(tasks.json())
 
     @staticmethod
     def delete(todo_id, task_id):

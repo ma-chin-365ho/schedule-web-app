@@ -38,12 +38,7 @@ class RestTodos():
         todos.title = title
         todos.tags = tags
         todos.add()
-        return jsonify({
-            'archiveId': archive_id,
-            'id': todo_id,
-            'title': title,
-            'tags': tags
-        })
+        return jsonify(todos.json())
 
     @staticmethod
     def put():
@@ -64,12 +59,7 @@ class RestTodos():
         todos.title = title
         todos.tags = tags
         todos.update()
-        return jsonify({
-            'archiveId': archive_id,
-            'id': todo_id,
-            'title': title,
-            'tags': tags
-        })
+        return jsonify(todos.json())
 
     @staticmethod
     def delete(archive_id, todo_id):

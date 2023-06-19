@@ -3,7 +3,8 @@ import requests
 
 from constants import API_URL
 from tests.utils import get_test_json_by_tablename
-from db.tasks import TASKS_TABLE
+from db.tasks import TASKS_TABLE, TASKS_COUNTER_NAME
+from db.dynamodb import COUNTERS_TABLE
 
 def test_tasks_get_all(db_data):
     r = requests.get(API_URL + '/tasks')
@@ -47,6 +48,33 @@ def test_tasks_post(db_data):
 
     assert v == e_v
     assert r.status_code == 200
+
+def test_tasks_post_auto_increment(db_data):
+    post_data = {
+        "todoId" : 121212,
+        "title": "テストポスト・・・タイトル",
+        "schedualStDate": 20211201,
+        "schedualStTime": 0,
+        "schedualEdDate": 20211220,
+        "schedualEdTime": 1801,
+        "contents": "インクリメント　テスト　　テスト",
+        "tags": ["aaaaaa", "test"]
+    }
+    id_by_counter = list(filter(
+        lambda item : item['name'] == TASKS_COUNTER_NAME,
+        get_test_json_by_tablename(COUNTERS_TABLE)
+    ))[0]['val']
+
+    r = requests.post(API_URL + '/tasks', json = post_data)
+    assert r.status_code == 200
+
+    target_id = str(post_data["todoId"])
+    r = requests.get(API_URL + '/tasks/' + target_id)
+    v = r.json()
+    e_v = [dict(post_data, **{"id" : id_by_counter+1})]
+    assert v == e_v
+    assert r.status_code == 200
+
 
 def test_tasks_put(db_data):
     put_data = {

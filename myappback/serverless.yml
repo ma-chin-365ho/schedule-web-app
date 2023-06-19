@@ -9,6 +9,10 @@ custom:
     todos: 'todos-table-${sls:stage}'
     tasks: 'tasks-table-${sls:stage}'
     counters: 'counters-table-${sls:stage}'
+  counterName:
+    archives: 'archives'
+    todos: 'todos'
+    tasks: 'tasks'
   wsgi:
     app: app.app
   dynamodb:
@@ -48,6 +52,9 @@ provider:
     TODOS_TABLE: ${self:custom.tableName.todos}
     TASKS_TABLE: ${self:custom.tableName.tasks}
     COUNTERS_TABLE: ${self:custom.tableName.counters}
+    ARCHIVES_COUNTER_NAME: ${self:custom.counterName.archives}
+    TODOS_COUNTER_NAME: ${self:custom.counterName.todos}
+    TASKS_COUNTER_NAME: ${self:custom.counterName.tasks}
 
 functions:
   api:

@@ -1,13 +1,13 @@
 import os
-from db.dynamodb import DynamoDB
+from db.dynamodb import DynamoDB, COUNTERS_TABLE
 
-COUNTERS_TABLE = os.environ['COUNTERS_TABLE']
+# COUNTERS_TABLE = os.environ['COUNTERS_TABLE']
 
 class Counters(DynamoDB):
     def __init__(self):
         super().__init__(COUNTERS_TABLE)
         self.name = None
-        self.value = None
+        self.val = None
     
     def key_json(self, key_val):
         json = {
@@ -22,7 +22,7 @@ class Counters(DynamoDB):
     def item_json(self):
         json = {
             'name': {'S': self.name},
-            'value': {'N': self.value}
+            'val': {'N': self.value}
         }
         return json
 

@@ -1,9 +1,13 @@
 #!/bin/bash
+source venv/bin/activate
 source setup.sh
 export ARCHIVES_TABLE=archives-table-dev
 export TODOS_TABLE=todos-table-dev
 export TASKS_TABLE=tasks-table-dev
-export COUNTERS_TABLE=ounters-table-dev
+export COUNTERS_TABLE=counters-table-dev
+export ARCHIVES_COUNTER_NAME=archives
+export TODOS_COUNTER_NAME=todos
+export TASKS_COUNTER_NAME=tasks
 
 ./run_dynamodb.sh &
 # wait start

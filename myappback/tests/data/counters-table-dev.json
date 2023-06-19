@@ -1,14 +1,14 @@
 [
   {
     "name": {"S": "archives"},
-    "value": {"N": "3"}
+    "val": {"N": "3"}
   },
   {
     "name": {"S": "todos"},
-    "value": {"N": "4"}
+    "val": {"N": "4"}
   },
   {
     "name": {"S": "tasks"},
-    "value": {"N": "6"}
+    "val": {"N": "6"}
   }
 ]

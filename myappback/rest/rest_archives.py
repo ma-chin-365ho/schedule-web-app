@@ -23,14 +23,14 @@ class RestArchives():
     def post():
         archive_id = request.json.get('id')
         title = request.json.get('title')
-        if not archive_id or not title:
+        if not title:
             return jsonify({'error': 'Please provide both "id" and "title"'}), 400
 
         archives = Archives()
         archives.id = archive_id
         archives.title = title
         archives.add()
-        return jsonify({'id': archive_id, 'title': title})
+        return jsonify(archives.json())
 
     @staticmethod
     def put():
@@ -43,7 +43,7 @@ class RestArchives():
         archives.id = archive_id
         archives.title = title
         archives.update()
-        return jsonify({'id': archive_id, 'title': title})
+        return jsonify(archives.json())
 
     @staticmethod
     def delete(archive_id):
