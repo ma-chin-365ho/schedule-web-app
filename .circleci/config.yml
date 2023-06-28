@@ -38,22 +38,12 @@ commands:
             cd ../ci
             ./test.sh -m false
       - slack/notify:
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*Finish!! Schedual App CI/CD*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
-          event: always  
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+        
 
 jobs:
   job-sls-test:
