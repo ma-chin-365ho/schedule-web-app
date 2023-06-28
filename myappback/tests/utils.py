@@ -3,7 +3,9 @@ import glob
 import os
 import json
 import boto3
+import requests
 from db.dynamodb import offline_dynamodb_client, remove_type_dynamodb_json
+from constants import API_URL
 
 dynamodb_test_data = []
 json_test_data = []
@@ -39,3 +41,10 @@ def get_test_json_by_tablename(table_name):
         if tn == table_name:
             data = js
     return data
+
+def ok_communication_web_server():
+    r = requests.get(API_URL)
+    if r.status_code == 403:
+        return False
+    else:
+        return True

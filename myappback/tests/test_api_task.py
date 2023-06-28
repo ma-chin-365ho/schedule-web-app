@@ -6,7 +6,7 @@ from tests.utils import get_test_json_by_tablename
 from db.tasks import TASKS_TABLE, TASKS_COUNTER_NAME
 from db.dynamodb import COUNTERS_TABLE
 
-def test_tasks_get_all(db_data):
+def test_tasks_get_all(db_data, web_access):
     r = requests.get(API_URL + '/tasks')
     v = r.json()
     e_v = get_test_json_by_tablename(TASKS_TABLE)
@@ -14,7 +14,7 @@ def test_tasks_get_all(db_data):
     assert sorted(v, key=lambda x: x['id']) == e_v
     assert r.status_code == 200
 
-def test_tasks_get(db_data):
+def test_tasks_get(db_data, web_access):
     target_id = "2"
     r = requests.get(API_URL + '/tasks/' + target_id)
     v = r.json()
@@ -23,10 +23,10 @@ def test_tasks_get(db_data):
         get_test_json_by_tablename(TASKS_TABLE)
     ))
 
-    assert sorted(v, key=lambda x: x['id']) != e_v
+    assert sorted(v, key=lambda x: x['id']) == e_v
     assert r.status_code == 200
 
-def test_tasks_post(db_data):
+def test_tasks_post(db_data, web_access):
     post_data = {
         "todoId" : 111111,
         "id": 1000,
@@ -49,7 +49,7 @@ def test_tasks_post(db_data):
     assert v == e_v
     assert r.status_code == 200
 
-def test_tasks_post_auto_increment(db_data):
+def test_tasks_post_auto_increment(db_data, web_access):
     post_data = {
         "todoId" : 121212,
         "title": "テストポスト・・・タイトル",
@@ -76,7 +76,7 @@ def test_tasks_post_auto_increment(db_data):
     assert r.status_code == 200
 
 
-def test_tasks_put(db_data):
+def test_tasks_put(db_data, web_access):
     put_data = {
         "todoId" : 3,
         "id": 5,
@@ -101,7 +101,7 @@ def test_tasks_put(db_data):
     assert v == e_v
     assert r.status_code == 200
 
-def test_tasks_delete(db_data):
+def test_tasks_delete(db_data, web_access):
     target_todo_id = "2"
     target_id = "1"
     r = requests.delete(API_URL + '/tasks/' + target_todo_id + '/' + target_id)

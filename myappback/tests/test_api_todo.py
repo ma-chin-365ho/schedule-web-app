@@ -6,7 +6,7 @@ from tests.utils import get_test_json_by_tablename
 from db.todos import TODOS_TABLE, TODOS_COUNTER_NAME
 from db.dynamodb import COUNTERS_TABLE
 
-def test_todos_get_all(db_data):
+def test_todos_get_all(db_data, web_access):
     r = requests.get(API_URL + '/todos')
     v = r.json()
     e_v = get_test_json_by_tablename(TODOS_TABLE)
@@ -14,7 +14,7 @@ def test_todos_get_all(db_data):
     assert sorted(v, key=lambda x: x['id']) == e_v
     assert r.status_code == 200
 
-def test_todos_get(db_data):
+def test_todos_get(db_data, web_access):
     target_id = "1"
     r = requests.get(API_URL + '/todos/' + target_id)
     v = r.json()
@@ -26,7 +26,7 @@ def test_todos_get(db_data):
     assert sorted(v, key=lambda x: x['id']) == e_v
     assert r.status_code == 200
 
-def test_todos_post(db_data):
+def test_todos_post(db_data, web_access):
     post_data = {
         "archiveId" : 2222,
         "id" : 45,
@@ -43,7 +43,7 @@ def test_todos_post(db_data):
     assert v == e_v
     assert r.status_code == 200
 
-def test_todos_post_auto_increment(db_data):
+def test_todos_post_auto_increment(db_data, web_access):
     post_data = {
         "archiveId" : 4321,
         "title" : "テスト　ポスト 22",
@@ -64,7 +64,7 @@ def test_todos_post_auto_increment(db_data):
     assert v == e_v
     assert r.status_code == 200
 
-def test_todos_put(db_data):
+def test_todos_put(db_data, web_access):
     put_data = {
         "archiveId" : 2,
         "id" : 3,
@@ -84,7 +84,7 @@ def test_todos_put(db_data):
     assert v == e_v
     assert r.status_code == 200
 
-def test_todos_delete(db_data):
+def test_todos_delete(db_data, web_access):
     target_archive_id = "2"
     target_id = "4"
     r = requests.delete(API_URL + '/todos/' + target_archive_id + '/' + target_id)
