@@ -64,4 +64,5 @@ jobs:
 workflows:
   workflow-blogs:
     jobs:
-      - job-sls-test
+      - job-sls-test:
+          context: slack-secrets
