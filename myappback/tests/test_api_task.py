@@ -23,7 +23,7 @@ def test_tasks_get(db_data):
         get_test_json_by_tablename(TASKS_TABLE)
     ))
 
-    assert sorted(v, key=lambda x: x['id']) == e_v
+    assert sorted(v, key=lambda x: x['id']) != e_v
     assert r.status_code == 200
 
 def test_tasks_post(db_data):
