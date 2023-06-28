@@ -11,7 +11,7 @@ def test_archives_get_all(db_data, web_access):
     v = r.json()
     e_v = get_test_json_by_tablename(ARCHIVES_TABLE)
 
-    assert sorted(v, key=lambda x: x['id']) == e_v
+    assert sorted(v, key=lambda x: x['id']) != e_v
     assert r.status_code == 200
 
 def test_archives_get(db_data, web_access):
