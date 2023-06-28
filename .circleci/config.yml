@@ -1,0 +1,67 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.12.5
+
+executors:
+  executor-sls:
+    docker:
+      - image: machin365ho/cimg-sls:2022.09 # the primary container, where your job's commands are run
+    environment:
+      AWS_DEFAULT_REGION: ap-northeast-1
+    working_directory: ~/project/co
+
+commands:
+  command-sls:
+    steps:
+      - checkout # check out the code in the project directory
+      - run:
+          name: "Move Checkout Dir"
+          command: |
+            cd ..
+            mv -f co/myappback/* ci
+      - run:
+          name: "Start Flask Server"
+          command: |
+            cd ../ci
+            ./run_flask.sh
+          background: true
+      - run:
+          name: "Start DynamoDB Server"
+          command: |
+            cd ../ci
+            ./run_dynamodb.sh
+          background: true
+      - run:
+          name: "Test"
+          command: |
+            cd ../ci
+            ./test.sh -m false
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*Finish!! Schedual App CI/CD*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always  
+
+jobs:
+  job-sls-test:
+    executor: executor-sls
+    steps:
+      - command-sls
+
+workflows:
+  workflow-blogs:
+    jobs:
+      - job-sls-test
